@@ -1,0 +1,4 @@
+Lab-4.pdf
+data.txt
+btlk.doc
+10MB.zip
