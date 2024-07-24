@@ -8,8 +8,13 @@ from messCore import *
 from colorama import just_fix_windows_console
 just_fix_windows_console()
 PORT = 5050
-SERVER_IP = socket.gethostbyname(socket.gethostname())
-ADDR = (SERVER_IP, PORT)
+ip = input("Please enter an ip addresss: ")
+if ip is None or ip == "":
+    ip = socket.gethostbyname(socket.gethostname())
+    
+# SERVER_IP = socket.gethostbyname(socket.gethostname())
+
+ADDR = (ip, PORT)
 stop_event = threading.Event()
 
 hold_event = threading.Event()
@@ -76,6 +81,7 @@ def receive_file(client, data):
         progress_dict[filename] += chunk["size_of_chunk"]
         if chunk['end_file']:
             chunk_dict.remove(filename)
+            clear_line()
             myLogging.logQueue.put(
                 f"Downloading {filename} .... {progress_dict[filename] / int(downloadable_file[filename]) * 100:.2f}%")
             progress_dict.pop(filename)
@@ -192,14 +198,17 @@ def read_file():
                 line = line.strip('\n')
                 data = line.split(',')
                 if len(data) != 2:
-                    myLogging.logQueue.put(f"Invalid input line \"{data}\"")
+                    clear_line()
+                    myLogging.logQueue.put(f"Invalid input line \"{line}\"")
                     continue
                 data[0] = data[0].strip(' ')
                 data[1] = data[1].strip(' ')
                 if data[0] not in file_set:
                     if data[0] not in downloadable_file:
+                        clear_line()
                         myLogging.logQueue.put(f"The item \"{data[0]}\" does not exist")
                     elif data[1] not in order_request:
+                        clear_line()
                         myLogging.logQueue.put(f"{data[1]} is a unsupported download order")
                     else:
                         send_data(client, data[1])
